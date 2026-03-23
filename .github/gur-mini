@@ -1,0 +1,120 @@
+#!/usr/bin/env bash
+
+# SPDX-License-Identifier: AGPL-3.0
+
+#
+#    gur-mini
+#
+#    ----------------------------------------------------------------------
+#    Copyright © 2024, 2025, 2026 Pellegrino Prevete
+#
+#    All rights reserved
+#    ----------------------------------------------------------------------
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+_global_variables() {
+  app_opts=()
+  namespace=""
+  repo=""
+  tag=""
+}
+
+_gur_mini() {
+  local \
+    _namespace="${1}" \
+    _repo="${2}" \
+    _tag \
+    _project_id \
+    _gl_dl_opts=() \
+    _api \
+    _url \
+    _urls=() \
+    _job_latest \
+    _output_file \
+    _token_private
+  shift \
+    2
+  _tag=""
+  if (( 0 < "${#}" )); then
+    _tag="${1}"
+  fi
+  _gh_opts+=(
+    --repo
+      "${_namespace}/${_repo}-ur"
+  )
+  if [[ "${_tag}" == "" ]]; then
+    _msg=(
+      "[gur-mini] ERROR:"
+      "A tag must be specified."
+    )
+    echo \
+      "${_msg[*]}" >&2
+    return \
+      1
+  fi
+  gh \
+    "${_gh_opts[@]}" \
+    release \
+      download \
+      "${_tag}" \
+      --pattern \
+        '*.pkg.tar.xz'
+}
+
+_usage() {
+  local \
+    _exit="${1}"
+  _msg=(
+    "Mini gur client (Github)"
+    ""
+    "gur-mini"
+    "  <namespace>"
+    "  <repo>"
+    "  <tag>"
+    ""
+  )
+  printf \
+    '%s\n' \
+    "${_msg[@]}"
+  return \
+    "${_exit}"
+}
+
+_global_variables
+
+namespace="${1}"
+repo="${2}"
+tag="${3}"
+
+for _arg in "$@"; do
+  if [[ "${_arg}" == "-h" ]]; then
+    _usage \
+      0
+  fi
+done
+
+if (( "${#}" < 3 )); then
+  _usage \
+    1
+fi
+
+app_opts=(
+  "${namespace}"
+  "${repo}"
+  "${tag}"
+)
+
+_gur_mini \
+  "${app_opts[@]}"
