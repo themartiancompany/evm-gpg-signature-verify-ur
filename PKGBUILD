@@ -83,7 +83,7 @@ if [[ "${_docs}" == "true" ]]; then
 fi
 pkgver="0.0.0.0.0.0.0.0.0.0.0.1"
 _commit="f3119e390abca7bc4bc313c3d351f31b7799cb24"
-pkgrel=2
+pkgrel=3
 _pkgdesc=(
   "Checks if a file is cryptographically signed"
   "by an Ethereum Virtual Machine-compatible blockchain"
